@@ -18,4 +18,6 @@ if [[ ! -f cavalier ]]; then
     exit 1
 fi
 
+export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH
+
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/vosklib:$(pwd)/whisper.cpp/build_go/src:$(pwd)/whisper.cpp/build_go/ggml/src ./cavalier
