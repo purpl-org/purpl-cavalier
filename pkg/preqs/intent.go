@@ -15,6 +15,12 @@ func (s *Server) ProcessIntent(req *vtt.IntentRequest) (*vtt.IntentResponse, err
 	var successMatched bool
 	speechReq := sr.ReqToSpeechRequest(req)
 	var transcribedText string
+
+	if vars.IsESNBlacklisted(req.Device) {
+		fmt.Println("Blocked request from blacklisted ESN: " + req.Device)
+		return nil, fmt.Errorf("device is blacklisted")
+	}
+	
 	if !isSti {
 		var err error
 		transcribedText, err = sttHandler(speechReq)
