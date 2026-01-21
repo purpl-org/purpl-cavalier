@@ -13,12 +13,28 @@ import (
 
 var cantProcessIntent string = "Sorry for the inconvenience, I've most likely ran out of houndify credits for today and can't process this intent graph request. Please try again later."
 
+var youFuckedUp string = "Your Vector has been blacklisted from the purple O S server."
+
 func (s *Server) ProcessIntentGraph(req *vtt.IntentGraphRequest) (*vtt.IntentGraphResponse, error) {
 	var successMatched bool
 	speechReq := sr.ReqToSpeechRequest(req)
 	var transcribedText string
 	if !isSti {
 		var err error
+		
+	// Check if ESN is blacklisted
+	if vars.IsESNBlacklisted(req.Device) {
+		fmt.Println("Blocked request from blacklisted ESN: " + req.Device)
+		InitKnowledge() // Errors without this for whatever reason even though I think it should be inited already
+
+		fmt.Println("This person fucked up")
+		fmt.Println(youFuckedUp)
+		ttr.KnowledgeGraphResponseIG(req, youFuckedUp, transcribedText)
+
+		fmt.Println("Houndify returned empty or error response")
+		return nil, fmt.Errorf("device is blacklisted")
+	}
+		
 		transcribedText, err = sttHandler(speechReq)
 		if err != nil {
 			ttr.IntentPass(req, "intent_system_noaudio", "voice processing error: "+err.Error(), map[string]string{"error": err.Error()}, true)
